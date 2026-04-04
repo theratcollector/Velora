@@ -1,0 +1,16 @@
+:root{
+    --color-bg: rgba(16, 16, 16, 1);
+    --color-primary: rgba(253, 93, 30, 1);
+    --color-secondary: rgba(45, 45, 45, 1);
+    --color-text: #e5e7eb;
+}
+
+body{
+    background-color: var(--color-bg);
+    font-family: "inter", sans-serif;
+    color: var(--color-text);
+}
+
+h1{
+    font-family: "space grotesk", sans-serif;
+}
