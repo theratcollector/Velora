@@ -1,24 +1,37 @@
 <script lang="ts"> 
+    import { createWebHaptics } from "web-haptics/svelte";
+	import { onDestroy } from "svelte";
+	const { trigger, destroy } = createWebHaptics({ debug: true });
+	onDestroy(destroy);
+
     let{
         disabled = false,
         onClick = () => {},
-        class: className = ""
+        class: className = "",
+        type = "button",
+        children,
+        spacingLR = "2.5rem",
     } = $props();
 </script>
 
-<button class={`btn ${className}`} disabled={disabled} onclick={onClick}>
-    <slot />
+<button class={`btn ${className}`} disabled={disabled} onclick={() => {onClick?.();trigger();}} type={type} style="padding: 0.8rem {spacingLR};">
+    {@render children?.()}
 </button>
 
 <style>
     .btn {
-        padding: 0.8rem 2.5rem;
         border: none;
         border-radius: 10px;
         cursor: pointer;
         font-size: 1rem;
         font-weight: 500;
         transition: 0.3s ease;
+
+        gap: 0.5rem;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .btn-primary {
@@ -45,6 +58,6 @@
     }
 
     .btn:active:not(:disabled) {
-        transform: scale(0.97);
+        transform: scale(1);
     }
 </style>

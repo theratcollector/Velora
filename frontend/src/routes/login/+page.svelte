@@ -24,7 +24,7 @@
             return;
         }
 
-        const res = await fetch(`${apiBase}/login`, {
+        const res = await fetch(`${apiBase}/auth/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -38,7 +38,8 @@
         const data = await res.json();
         
         if(res.ok){
-            localStorage.setItem("token", data.token);
+            localStorage.setItem("accessToken", data.accessToken);
+            localStorage.setItem("refreshToken", data.refreshToken);
             window.location.href = '/';
         } else {
             error = data.message;
@@ -74,7 +75,7 @@
         </label>
 
         <div class="btn-div">
-            <Button class="btn-primary fit">Login</Button>
+            <Button class="btn-primary fit" onClick={handleLogin}>Login</Button>
             <Button class="btn-secondary fit" onClick={() => window.location.href = '/register'}>Register</Button>
         </div>
     </form>

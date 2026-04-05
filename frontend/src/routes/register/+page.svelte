@@ -16,7 +16,7 @@
             return;
         }
 
-        const res = await fetch(`${apiBase}/register`, {
+        const res = await fetch(`${apiBase}/auth/register`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
