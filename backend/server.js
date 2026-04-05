@@ -4,6 +4,7 @@ const jsonwebtoken = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const authenticateToken = require('./middleware/auth.js');
 const {
     getUserByEmail,
     createUser,
@@ -11,7 +12,11 @@ const {
     getUserById,
     pushRefreshToken,
     deleteRefreshToken,
-    getRefreshToken
+    getRefreshToken,
+    createChat,
+    getChatById,
+    addChatParticipant,
+    getChatsForUser
 } = require('./db.js');
 
 const app = express();
@@ -108,32 +113,30 @@ app.post("/auth/refresh", (req, res) => {
     try {
         const decoded = jsonwebtoken.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
         const userId = decoded.id;
-        const newAccessToken = jsonwebtoken.sign({ id: userId }, process.env.JWT_ACCESS_SECRET, { expiresIn: '1h' });
+        const user = getUserById(userId);
+
+        if(!user){
+            return res.status(404).json({ message: "User not found" });
+        }
+        const newAccessToken = jsonwebtoken.sign(user, process.env.JWT_ACCESS_SECRET, { expiresIn: '1h' });
         res.status(200).json({ accessToken: newAccessToken });
     } catch (err) {
         return res.status(400).json({ message: "Invalid refresh token" });
     }
 });
 
-app.get("/auth/me", (req, res) => {
-    const authHeader = req.headers.authorization;
+app.get("/auth/me", authenticateToken, (req, res) => {
+    res.status(200).json({
+        id: req.user.id,
+        username: req.user.username,
+        email: req.user.email,
+        created_at: req.user.created_at
+    });
+});
 
-    if (!authHeader) {
-        return res.status(401).json({ message: "Authorization header is required" });
-    }
-
-    const token = authHeader.split(" ")[1];
-
-    try {
-        const decoded = jsonwebtoken.verify(token, process.env.JWT_ACCESS_SECRET);
-        const user = getUserById(decoded.id);
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        res.status(200).json({ id: user.id, username: user.username, email: user.email });
-    } catch (err) {
-        return res.status(401).json({ message: "Invalid access token" });
-    }
+app.post("/chats", authenticateToken, (req, res) => {
+    const user = req.user;
+    console.log("getting chats for user", user.name, user.id, user.email, user.username);
 });
 
 app.listen(port, () => {
